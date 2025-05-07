@@ -133,17 +133,10 @@ const sketch = (p: p5) => {
 
   // Handle window resize
   p.windowResized = () => {
-    // Clear the p5-container to remove any old canvases
-    const container = document.getElementById('p5-container');
-    if (container) {
-      // Remove all child elements except the current canvas
-      while (container.firstChild) {
-        container.removeChild(container.firstChild);
-      }
-    }
-
     // Calculate new dimensions with 4:3 aspect ratio
     const dimensions = calculateCanvasDimensions(window.innerWidth, window.innerHeight);
+
+    // Resize the canvas using p5's built-in method
     p.resizeCanvas(dimensions.width, dimensions.height);
 
     // Redraw the white background
@@ -158,12 +151,6 @@ const sketch = (p: p5) => {
 
     // Reset brush
     brush.resetAll();
-
-    // Re-append the canvas to the container
-    const canvasElement = document.querySelector('canvas');
-    if (canvasElement && container) {
-      container.appendChild(canvasElement);
-    }
   };
 
   // Add key press functionality to clear the canvas or save the result
