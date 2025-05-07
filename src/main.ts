@@ -40,33 +40,85 @@ function updateColorIndicator(color: string) {
   }
 }
 
-// Function to draw a smooth line between two points
-function drawSmoothLine(g: p5 | p5.Graphics, x1: number, y1: number, x2: number, y2: number) {
-  // Calculate distance between points
-  const distance = g.dist(x1, y1, x2, y2);
+// Spring-based brush variables
+let brushSize = config.brushSize;
+let isDrawing = false;
+let x = 0;
+let y = 0;
+let vx = 0;
+let vy = 0;
+let v = 0.5;
+let r = 0;
+let oldR = 0;
+let spring = 0.4;
+let friction = 0.45;
+let splitNum = 100;
+let diff = 2;
 
-  // If the distance is very small, just draw a single point
-  if (distance < 3) {
-    g.point(x2, y2);
+// Function to draw a brush stroke using spring physics
+function drawSpringBrush(g: p5 | p5.Graphics, mouseX: number, mouseY: number) {
+  if (!isDrawing) {
+    isDrawing = true;
+    x = mouseX;
+    y = mouseY;
     return;
   }
 
-  // Calculate how many points to interpolate based on distance
-  const steps = Math.min(Math.max(Math.floor(distance / 2), 3), 10);
+  // Apply spring physics
+  vx += (mouseX - x) * spring;
+  vy += (mouseY - y) * spring;
+  vx *= friction;
+  vy *= friction;
 
-  // Draw a series of connected lines for smoother appearance
-  for (let i = 0; i < steps; i++) {
-    const t = i / steps;
-    const nextT = (i + 1) / steps;
+  v += Math.sqrt(vx * vx + vy * vy) - v;
+  v *= 0.55;
 
-    // Linear interpolation between points
-    const x1i = g.lerp(x1, x2, t);
-    const y1i = g.lerp(y1, y2, t);
-    const x2i = g.lerp(x1, x2, nextT);
-    const y2i = g.lerp(y1, y2, nextT);
+  oldR = r;
+  r = brushSize - v;
 
-    g.line(x1i, y1i, x2i, y2i);
+  // Draw multiple lines with slight variations to create brush effect
+  for (let i = 0; i < splitNum; ++i) {
+    const oldX = x;
+    const oldY = y;
+    x += vx / splitNum;
+    y += vy / splitNum;
+    oldR += (r - oldR) / splitNum;
+
+    if (oldR < 1) { 
+      oldR = 1; 
+    }
+
+    // Draw main line with variation
+    g.strokeWeight(oldR + diff);
+    g.line(
+      x + g.random(0, 2), 
+      y + g.random(0, 2), 
+      oldX + g.random(0, 2), 
+      oldY + g.random(0, 2)
+    );
+
+    // Draw additional lines for brush texture
+    g.strokeWeight(oldR);
+    g.line(
+      x + diff * g.random(0.1, 2), 
+      y + diff * g.random(0.1, 2), 
+      oldX + diff * g.random(0.1, 2), 
+      oldY + diff * g.random(0.1, 2)
+    );
+    g.line(
+      x - diff * g.random(0.1, 2), 
+      y - diff * g.random(0.1, 2), 
+      oldX - diff * g.random(0.1, 2), 
+      oldY - diff * g.random(0.1, 2)
+    );
   }
+}
+
+// Reset the brush state when drawing stops
+function resetBrush() {
+  vx = 0;
+  vy = 0;
+  isDrawing = false;
 }
 
 // Function to calculate canvas dimensions with 4:3 aspect ratio
@@ -239,14 +291,18 @@ const sketch = (p: p5) => {
         drawingBuffer.stroke(currentColor)
         updateColorIndicator(currentColor)
         isDragging = true
+        // Reset brush size for new stroke
+        brushSize = config.brushSize
       }
 
-      // Draw a smoother line to the drawing buffer
-      drawSmoothLine(drawingBuffer, p.pmouseX, p.pmouseY, p.mouseX, p.mouseY)
+      // Draw using spring-based brush technique
+      drawSpringBrush(drawingBuffer, p.mouseX, p.mouseY)
     } else {
       // When mouse is released, show the next color in the indicator
       if (isDragging) {
         updateColorIndicator(nextColor)
+        // Reset brush state when drawing stops
+        resetBrush()
       }
       // Reset dragging state when mouse is released
       isDragging = false
@@ -286,6 +342,15 @@ const sketch = (p: p5) => {
     drawingBuffer.stroke(currentColor)
     drawingBuffer.strokeWeight(config.brushSize)
 
+    // Reset spring-based brush variables
+    brushSize = config.brushSize
+    isDrawing = false
+    vx = 0
+    vy = 0
+    v = 0.5
+    r = 0
+    oldR = 0
+
     // Copy the content back if we had a previous buffer
     if (tempDrawingBuffer) {
       drawingBuffer.image(tempDrawingBuffer, 0, 0, p.width, p.height)
@@ -311,6 +376,16 @@ const sketch = (p: p5) => {
       if (drawingBuffer) {
         drawingBuffer.clear()
       }
+      // Reset spring-based brush variables
+      brushSize = config.brushSize
+      isDrawing = false
+      vx = 0
+      vy = 0
+      v = 0.5
+      r = 0
+      oldR = 0
+      // Reset dragging state
+      isDragging = false
     }
     // Save canvas when 's' is pressed
     else if (p.key === 's' || p.key === 'S') {
