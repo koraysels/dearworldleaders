@@ -300,6 +300,9 @@ const sketch = (p: p5) => {
 
         // Clear localStorage
         clearDrawingFromLocalStorage()
+
+        // Reset saved drawing flag
+        hasSavedDrawing = false
       })
 
       // Initialize tooltip for restart icon
