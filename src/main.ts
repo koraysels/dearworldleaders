@@ -62,7 +62,13 @@ const sketch = (p: p5) => {
     const drawingBuffer = canvas.createDrawingBuffer();
 
     // Set initial stroke color and weight
-    p.stroke(currentColor);
+    // Parse the hex color and add the opacity value
+    const r = parseInt(currentColor.slice(1, 3), 16);
+    const g = parseInt(currentColor.slice(3, 5), 16);
+    const b = parseInt(currentColor.slice(5, 7), 16);
+    const a = config.brushOpacity * 255; // Convert 0-1 to 0-255 for p5.js
+
+    p.stroke(r, g, b, a);
     // If on a mobile device, use half the brush size
     const brushSize = isMobileDevice() ? config.brushSize / 2 : config.brushSize;
     p.strokeWeight(brushSize);

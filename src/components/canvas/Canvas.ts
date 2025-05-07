@@ -1,5 +1,6 @@
 import p5 from 'p5';
 import { saveDrawingToLocalStorage } from '../../utils/storage-utils';
+import config from '../../config/config';
 
 /**
  * Class to handle canvas creation and management
@@ -39,11 +40,17 @@ export class Canvas {
   }
 
   /**
-   * Sets the stroke color for the drawing buffer
+   * Sets the stroke color for the drawing buffer with configurable opacity
    */
   public setStrokeColor(color: string): void {
     if (this.drawingBuffer) {
-      this.drawingBuffer.stroke(color);
+      // Parse the hex color and add the opacity value
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      const a = config.brushOpacity * 255; // Convert 0-1 to 0-255 for p5.js
+
+      this.drawingBuffer.stroke(r, g, b, a);
     }
   }
 
