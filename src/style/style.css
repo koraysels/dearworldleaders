@@ -107,3 +107,26 @@ canvas {
 #save-icon::after {
     content: "💾"; /* Unicode save icon */
 }
+
+#restart-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 140px; /* Position to the left of the save icon */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+    background-color: #ffffff;
+    cursor: pointer;
+    /* Add a simple restart icon using a Unicode character */
+    display: none; /* Hidden by default, shown when there's a saved drawing */
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+}
+
+#restart-icon::after {
+    content: "🔄"; /* Unicode restart icon */
+}

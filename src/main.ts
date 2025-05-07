@@ -140,6 +140,58 @@ function calculateCanvasDimensions(windowWidth: number, windowHeight: number) {
   return { width: canvasWidth, height: canvasHeight };
 }
 
+// Constants for localStorage
+const DRAWING_STORAGE_KEY = 'dearworldleaders_drawing'
+
+// Function to save drawing to localStorage
+function saveDrawingToLocalStorage(canvas: p5.Graphics) {
+  try {
+    const dataURL = canvas.elt.toDataURL('image/png')
+    localStorage.setItem(DRAWING_STORAGE_KEY, dataURL)
+
+    // Show restart button when there's a saved drawing
+    const restartIcon = document.getElementById('restart-icon')
+    if (restartIcon) {
+      restartIcon.style.display = 'flex'
+    }
+  } catch (error) {
+    console.error('Error saving drawing to localStorage:', error)
+  }
+}
+
+// Function to load drawing from localStorage
+function loadDrawingFromLocalStorage(p: p5, targetBuffer: p5.Graphics): boolean {
+  try {
+    const savedDrawing = localStorage.getItem(DRAWING_STORAGE_KEY)
+    if (savedDrawing) {
+      // Create an image from the saved data URL
+      const img = p.loadImage(savedDrawing, () => {
+        // Draw the loaded image onto the buffer
+        targetBuffer.image(img, 0, 0, targetBuffer.width, targetBuffer.height)
+      })
+      return true
+    }
+  } catch (error) {
+    console.error('Error loading drawing from localStorage:', error)
+  }
+  return false
+}
+
+// Function to clear drawing from localStorage
+function clearDrawingFromLocalStorage() {
+  try {
+    localStorage.removeItem(DRAWING_STORAGE_KEY)
+
+    // Hide restart button when there's no saved drawing
+    const restartIcon = document.getElementById('restart-icon')
+    if (restartIcon) {
+      restartIcon.style.display = 'none'
+    }
+  } catch (error) {
+    console.error('Error clearing drawing from localStorage:', error)
+  }
+}
+
 // Create a new p5 instance
 const sketch = (p: p5) => {
   // Variable to store the current user color
@@ -149,6 +201,7 @@ const sketch = (p: p5) => {
   let drawingBuffer: p5.Graphics | null = null
   let textLayer: p5.Graphics | null = null
   let franxurterFont: p5.Font
+  let hasSavedDrawing = false
 
   // Preload function to load assets before setup
   p.preload = () => {
@@ -194,6 +247,19 @@ const sketch = (p: p5) => {
     // Update the color indicator with the initial color
     updateColorIndicator(currentColor)
 
+    // Check if there's a saved drawing in localStorage and load it
+    if (drawingBuffer) {
+      hasSavedDrawing = loadDrawingFromLocalStorage(p, drawingBuffer)
+
+      // Show restart button if there's a saved drawing
+      if (hasSavedDrawing) {
+        const restartIcon = document.getElementById('restart-icon')
+        if (restartIcon) {
+          restartIcon.style.display = 'flex'
+        }
+      }
+    }
+
     // Add event listener to the save icon
     const saveIcon = document.getElementById('save-icon')
     if (saveIcon) {
@@ -204,6 +270,41 @@ const sketch = (p: p5) => {
       // Initialize tooltip for save icon
       tippy(saveIcon, {
         content: 'Save as PNG',
+        placement: 'top',
+        arrow: true,
+        animation: 'scale',
+        theme: 'light'
+      })
+    }
+
+    // Add event listener to the restart icon
+    const restartIcon = document.getElementById('restart-icon')
+    if (restartIcon) {
+      restartIcon.addEventListener('click', () => {
+        // Clear the drawing buffer
+        if (drawingBuffer) {
+          drawingBuffer.clear()
+        }
+
+        // Reset spring-based brush variables
+        brushSize = config.brushSize
+        isDrawing = false
+        vx = 0
+        vy = 0
+        v = 0.5
+        r = 0
+        oldR = 0
+
+        // Reset dragging state
+        isDragging = false
+
+        // Clear localStorage
+        clearDrawingFromLocalStorage()
+      })
+
+      // Initialize tooltip for restart icon
+      tippy(restartIcon, {
+        content: 'Start new drawing',
         placement: 'top',
         arrow: true,
         animation: 'scale',
@@ -297,12 +398,20 @@ const sketch = (p: p5) => {
 
       // Draw using spring-based brush technique
       drawSpringBrush(drawingBuffer, p.mouseX, p.mouseY)
+
+      // Mark that we have a drawing that should be saved
+      hasSavedDrawing = true
     } else {
       // When mouse is released, show the next color in the indicator
       if (isDragging) {
         updateColorIndicator(nextColor)
         // Reset brush state when drawing stops
         resetBrush()
+
+        // Save the drawing to localStorage when the user stops drawing
+        if (drawingBuffer && hasSavedDrawing) {
+          saveDrawingToLocalStorage(drawingBuffer)
+        }
       }
       // Reset dragging state when mouse is released
       isDragging = false
@@ -386,6 +495,10 @@ const sketch = (p: p5) => {
       oldR = 0
       // Reset dragging state
       isDragging = false
+      // Clear localStorage
+      clearDrawingFromLocalStorage()
+      // Reset saved drawing flag
+      hasSavedDrawing = false
     }
     // Save canvas when 's' is pressed
     else if (p.key === 's' || p.key === 'S') {
