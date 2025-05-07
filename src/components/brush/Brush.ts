@@ -1,5 +1,6 @@
 import p5 from 'p5';
 import config from '../../config/config';
+import { isMobileDevice } from '../../utils/device-utils';
 
 /**
  * Class to handle brush mechanics and physics
@@ -21,7 +22,8 @@ export class Brush {
 
   constructor() {
     // Initialize brush properties
-    this.brushSize = config.brushSize;
+    // If on a mobile device, use half the brush size
+    this.brushSize = isMobileDevice() ? config.brushSize / 2 : config.brushSize;
     this.isDrawing = false;
     this.x = 0;
     this.y = 0;
@@ -110,7 +112,8 @@ export class Brush {
    * Reset all brush properties to initial values
    */
   public resetAll(): void {
-    this.brushSize = config.brushSize;
+    // If on a mobile device, use half the brush size
+    this.brushSize = isMobileDevice() ? config.brushSize / 2 : config.brushSize;
     this.isDrawing = false;
     this.vx = 0;
     this.vy = 0;

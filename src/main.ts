@@ -6,6 +6,7 @@ import config from './config/config'
 import { getRandomColor, updateColorIndicator } from './utils/color-utils'
 import { calculateCanvasDimensions } from './utils/canvas-utils'
 import { loadDrawingFromLocalStorage } from './utils/storage-utils'
+import { isMobileDevice } from './utils/device-utils'
 import { Brush } from './components/brush/Brush'
 import { Canvas } from './components/canvas/Canvas'
 import { TextLayer } from './components/textLayer/TextLayer'
@@ -62,9 +63,11 @@ const sketch = (p: p5) => {
 
     // Set initial stroke color and weight
     p.stroke(currentColor);
-    p.strokeWeight(config.brushSize);
+    // If on a mobile device, use half the brush size
+    const brushSize = isMobileDevice() ? config.brushSize / 2 : config.brushSize;
+    p.strokeWeight(brushSize);
     canvas.setStrokeColor(currentColor);
-    canvas.setStrokeWeight(config.brushSize);
+    canvas.setStrokeWeight(brushSize);
 
     // Create text layer
     textLayer.createTextLayer();
