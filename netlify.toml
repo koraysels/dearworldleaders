@@ -1,0 +1,12 @@
+# Netlify configuration file
+[build]
+  # Command to build the site
+  command = "npm run build"
+  # Directory to publish (output of the build)
+  publish = "dist"
+
+# Handle SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
