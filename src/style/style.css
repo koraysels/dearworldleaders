@@ -43,39 +43,32 @@ body {
     position: relative;
 }
 
-#text-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    pointer-events: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#svg-container {
-    width: 100%;
-    height: auto;
-    min-height: 80vh;
-    overflow: visible;
-}
-
-/* SVG text styling is primarily handled through attributes in the SVG element itself */
-#main-text {
-    user-select: none;
+/* Canvas styling */
+canvas {
+    display: block;
+    margin: 0 auto;
+    max-width: 100%;
+    max-height: 100%;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+    border-radius: .5rem;
+    padding: 1rem;
+    background-color: #fff;
 }
 
 #p5-container {
-    mix-blend-mode: multiply;
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: 2;
+    /* Center the canvas in the container */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f0f0f0; /* Light gray background for the container */
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 #color-indicator {
@@ -88,4 +81,28 @@ body {
     border: 3px solid white;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     z-index: 3;
+    cursor: pointer;
+}
+
+#save-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 80px; /* Position to the left of the color picker */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+    background-color: #ffffff;
+    cursor: pointer;
+    /* Add a simple save icon using a Unicode character */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+}
+
+#save-icon::after {
+    content: "💾"; /* Unicode save icon */
 }
