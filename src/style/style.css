@@ -1,0 +1,91 @@
+@font-face {
+    font-family: 'Franxurter';
+    src: url('/Franxurter.woff2') format('woff2'),
+    url('/Franxurter.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+:root {
+    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* RFS (Responsive Font Size) variables */
+    --rfs-base-value: 10;
+    --rfs-unit: rem;
+    --rfs-breakpoint: 1200px;
+    --rfs-breakpoint-unit: px;
+    --rfs-factor: 5;
+    --rfs-rem-value: var(--rfs-base-value);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: #fff;
+    width: 100vw;
+    height: 100vh;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+#text-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#svg-container {
+    width: 100%;
+    height: auto;
+    min-height: 80vh;
+    overflow: visible;
+}
+
+/* SVG text styling is primarily handled through attributes in the SVG element itself */
+#main-text {
+    user-select: none;
+}
+
+#p5-container {
+    mix-blend-mode: multiply;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+#color-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+}
