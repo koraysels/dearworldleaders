@@ -1,5 +1,7 @@
 import './style/style.css'
 import p5 from 'p5'
+import tippy from 'tippy.js'
+import 'tippy.js/dist/tippy.css'
 
 // Configuration object with defined colors
 const config = {
@@ -145,6 +147,27 @@ const sketch = (p: p5) => {
     if (saveIcon) {
       saveIcon.addEventListener('click', () => {
         p.save('dearworldleaders_drawing.png')
+      })
+
+      // Initialize tooltip for save icon
+      tippy(saveIcon, {
+        content: 'Save as PNG',
+        placement: 'top',
+        arrow: true,
+        animation: 'scale',
+        theme: 'light'
+      })
+    }
+
+    // Initialize tooltip for color indicator
+    const colorIndicator = document.getElementById('color-indicator')
+    if (colorIndicator) {
+      tippy(colorIndicator, {
+        content: 'Click to change color',
+        placement: 'top',
+        arrow: true,
+        animation: 'scale',
+        theme: 'light'
       })
     }
   }
