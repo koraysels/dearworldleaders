@@ -1,213 +1,37 @@
 import './style/style.css'
 import p5 from 'p5'
-import tippy from 'tippy.js'
 import 'tippy.js/dist/tippy.css'
 
-// Configuration object with defined colors
-const config = {
-  colors: [
-    '#FF5733', // Orange-Red
-    '#33FF57', // Green
-    '#3357FF', // Blue
-    '#F033FF', // Purple
-    '#FF33F0', // Pink
-    '#FFFF33', // Yellow
-    '#33FFFF', // Cyan
-    '#FF3333', // Red
-    '#33FF33', // Lime
-    '#3333FF'  // Deep Blue
-  ],
-  brushSize: 16, // 4x thicker than original (4)
-  aspectRatio: 4/3, // 4:3 aspect ratio for the canvas
-  baseWidth: 1280, // Base width for 4:3 ratio
-  baseHeight: 960, // Base height for 4:3 ratio
-  text: ["DEAR WORLD", " LEADERS,", "PLEASE STOP", "FUCKING UP", "OUR PLANET"], // Text split into 5 lines
-  fontSize: 240, // Font size in points
-  strokeWeight: 2 // Stroke weight for text
-}
-
-// Function to get a random color from config
-function getRandomColor(): string {
-  const randomIndex = Math.floor(Math.random() * config.colors.length)
-  return config.colors[randomIndex]
-}
-
-// Function to update the color indicator
-function updateColorIndicator(color: string) {
-  const colorIndicator = document.getElementById('color-indicator')
-  if (colorIndicator) {
-    colorIndicator.style.backgroundColor = color
-  }
-}
-
-// Spring-based brush variables
-let brushSize = config.brushSize;
-let isDrawing = false;
-let x = 0;
-let y = 0;
-let vx = 0;
-let vy = 0;
-let v = 0.5;
-let r = 0;
-let oldR = 0;
-let spring = 0.4;
-let friction = 0.45;
-let splitNum = 100;
-let diff = 2;
-
-// Function to draw a brush stroke using spring physics
-function drawSpringBrush(g: p5 | p5.Graphics, mouseX: number, mouseY: number) {
-  if (!isDrawing) {
-    isDrawing = true;
-    x = mouseX;
-    y = mouseY;
-    return;
-  }
-
-  // Apply spring physics
-  vx += (mouseX - x) * spring;
-  vy += (mouseY - y) * spring;
-  vx *= friction;
-  vy *= friction;
-
-  v += Math.sqrt(vx * vx + vy * vy) - v;
-  v *= 0.55;
-
-  oldR = r;
-  r = brushSize - v;
-
-  // Draw multiple lines with slight variations to create brush effect
-  for (let i = 0; i < splitNum; ++i) {
-    const oldX = x;
-    const oldY = y;
-    x += vx / splitNum;
-    y += vy / splitNum;
-    oldR += (r - oldR) / splitNum;
-
-    if (oldR < 1) { 
-      oldR = 1; 
-    }
-
-    // Draw main line with variation
-    g.strokeWeight(oldR + diff);
-    g.line(
-      x + g.random(0, 2), 
-      y + g.random(0, 2), 
-      oldX + g.random(0, 2), 
-      oldY + g.random(0, 2)
-    );
-
-    // Draw additional lines for brush texture
-    g.strokeWeight(oldR);
-    g.line(
-      x + diff * g.random(0.1, 2), 
-      y + diff * g.random(0.1, 2), 
-      oldX + diff * g.random(0.1, 2), 
-      oldY + diff * g.random(0.1, 2)
-    );
-    g.line(
-      x - diff * g.random(0.1, 2), 
-      y - diff * g.random(0.1, 2), 
-      oldX - diff * g.random(0.1, 2), 
-      oldY - diff * g.random(0.1, 2)
-    );
-  }
-}
-
-// Reset the brush state when drawing stops
-function resetBrush() {
-  vx = 0;
-  vy = 0;
-  isDrawing = false;
-}
-
-// Function to calculate canvas dimensions with 4:3 aspect ratio
-function calculateCanvasDimensions(windowWidth: number, windowHeight: number) {
-  // Calculate dimensions that fit within the window while maintaining 4:3 ratio
-  let canvasWidth, canvasHeight;
-
-  // If window is wider than 4:3 would require
-  if (windowWidth / windowHeight > 4/3) {
-    // Height is the limiting factor
-    canvasHeight = windowHeight;
-    canvasWidth = canvasHeight * (4/3);
-  } else {
-    // Width is the limiting factor
-    canvasWidth = windowWidth;
-    canvasHeight = canvasWidth / (4/3);
-  }
-
-  return { width: canvasWidth, height: canvasHeight };
-}
-
-// Constants for localStorage
-const DRAWING_STORAGE_KEY = 'dearworldleaders_drawing'
-
-// Function to save drawing to localStorage
-function saveDrawingToLocalStorage(canvas: p5.Graphics) {
-  try {
-    const dataURL = canvas.elt.toDataURL('image/png')
-    localStorage.setItem(DRAWING_STORAGE_KEY, dataURL)
-
-    // Show restart button when there's a saved drawing
-    const restartIcon = document.getElementById('restart-icon')
-    if (restartIcon) {
-      restartIcon.style.display = 'flex'
-    }
-  } catch (error) {
-    console.error('Error saving drawing to localStorage:', error)
-  }
-}
-
-// Function to load drawing from localStorage
-function loadDrawingFromLocalStorage(p: p5, targetBuffer: p5.Graphics): boolean {
-  try {
-    const savedDrawing = localStorage.getItem(DRAWING_STORAGE_KEY)
-    if (savedDrawing) {
-      // Create an image from the saved data URL
-      const img = p.loadImage(savedDrawing, () => {
-        // Draw the loaded image onto the buffer
-        targetBuffer.image(img, 0, 0, targetBuffer.width, targetBuffer.height)
-      })
-      return true
-    }
-  } catch (error) {
-    console.error('Error loading drawing from localStorage:', error)
-  }
-  return false
-}
-
-// Function to clear drawing from localStorage
-function clearDrawingFromLocalStorage() {
-  try {
-    localStorage.removeItem(DRAWING_STORAGE_KEY)
-
-    // Hide restart button when there's no saved drawing
-    const restartIcon = document.getElementById('restart-icon')
-    if (restartIcon) {
-      restartIcon.style.display = 'none'
-    }
-  } catch (error) {
-    console.error('Error clearing drawing from localStorage:', error)
-  }
-}
+import config from './config/config'
+import { getRandomColor, updateColorIndicator } from './utils/color-utils'
+import { calculateCanvasDimensions } from './utils/canvas-utils'
+import { loadDrawingFromLocalStorage } from './utils/storage-utils'
+import { Brush } from './components/brush/Brush'
+import { Canvas } from './components/canvas/Canvas'
+import { TextLayer } from './components/textLayer/TextLayer'
+import { UI } from './components/ui/UI'
 
 // Create a new p5 instance
 const sketch = (p: p5) => {
   // Variable to store the current user color
-  let currentColor = getRandomColor()
-  let nextColor = getRandomColor()
-  let isDragging = false
-  let drawingBuffer: p5.Graphics | null = null
-  let textLayer: p5.Graphics | null = null
-  let franxurterFont: p5.Font
-  let hasSavedDrawing = false
+  let currentColor = getRandomColor();
+  let nextColor = getRandomColor();
+  let isDragging = false;
+
+  // Component instances
+  let brush: Brush;
+  let canvas: Canvas;
+  let textLayer: TextLayer;
+  let ui: UI;
+
+  // Font
+  let franxurterFont: p5.Font;
 
   // Preload function to load assets before setup
   p.preload = () => {
     // Preload the Franxurter font
-    franxurterFont = p.loadFont('/Franxurter.otf')
-  }
+    franxurterFont = p.loadFont('/Franxurter.otf');
+  };
 
   // Setup function runs once at the beginning
   p.setup = () => {
@@ -215,172 +39,62 @@ const sketch = (p: p5) => {
     const dimensions = calculateCanvasDimensions(window.innerWidth, window.innerHeight);
 
     // Create canvas with 4:3 aspect ratio
-    const canvas = p.createCanvas(dimensions.width, dimensions.height)
-    canvas.parent('p5-container')
+    const p5Canvas = p.createCanvas(dimensions.width, dimensions.height);
+    p5Canvas.parent('p5-container');
 
     // Set pixel density to 2 for better rendering on high-DPI displays
-    p.pixelDensity(2)
+    p.pixelDensity(2);
 
     // Enable smoothing for better line quality
-    p.smooth()
+    p.smooth();
 
     // Set white background
-    p.background(255)
+    p.background(255);
 
-    // Create drawing buffer with the same dimensions
-    drawingBuffer = p.createGraphics(p.width, p.height)
-    drawingBuffer.pixelDensity(2)
-    drawingBuffer.smooth()
+    // Initialize components
+    brush = new Brush();
+    canvas = new Canvas(p);
+    textLayer = new TextLayer(p, franxurterFont);
+    ui = new UI(p, canvas, brush);
 
-    // Set blend mode to MULTIPLY for the drawing buffer
-    drawingBuffer.blendMode(p.MULTIPLY)
+    // Create drawing buffer
+    const drawingBuffer = canvas.createDrawingBuffer();
 
-    // Set initial stroke color and weight for both main canvas and buffer
-    p.stroke(currentColor)
-    p.strokeWeight(config.brushSize)
-    drawingBuffer.stroke(currentColor)
-    drawingBuffer.strokeWeight(config.brushSize)
+    // Set initial stroke color and weight
+    p.stroke(currentColor);
+    p.strokeWeight(config.brushSize);
+    canvas.setStrokeColor(currentColor);
+    canvas.setStrokeWeight(config.brushSize);
 
     // Create text layer
-    createTextLayer()
+    textLayer.createTextLayer();
 
     // Update the color indicator with the initial color
-    updateColorIndicator(currentColor)
+    updateColorIndicator(currentColor);
 
     // Check if there's a saved drawing in localStorage and load it
-    if (drawingBuffer) {
-      hasSavedDrawing = loadDrawingFromLocalStorage(p, drawingBuffer)
-
-      // Show restart button if there's a saved drawing
-      if (hasSavedDrawing) {
-        const restartIcon = document.getElementById('restart-icon')
-        if (restartIcon) {
-          restartIcon.style.display = 'flex'
-        }
-      }
+    const drawingLoaded = loadDrawingFromLocalStorage(p, drawingBuffer);
+    if (drawingLoaded) {
+      canvas.setHasSavedDrawing(true);
+      ui.updateUIForSavedDrawing(true);
     }
-
-    // Add event listener to the save icon
-    const saveIcon = document.getElementById('save-icon')
-    if (saveIcon) {
-      saveIcon.addEventListener('click', () => {
-        p.save('dearworldleaders_drawing.png')
-      })
-
-      // Initialize tooltip for save icon
-      tippy(saveIcon, {
-        content: 'Save as PNG',
-        placement: 'top',
-        arrow: true,
-        animation: 'scale',
-        theme: 'light'
-      })
-    }
-
-    // Add event listener to the restart icon
-    const restartIcon = document.getElementById('restart-icon')
-    if (restartIcon) {
-      restartIcon.addEventListener('click', () => {
-        // Clear the drawing buffer
-        if (drawingBuffer) {
-          drawingBuffer.clear()
-        }
-
-        // Reset spring-based brush variables
-        brushSize = config.brushSize
-        isDrawing = false
-        vx = 0
-        vy = 0
-        v = 0.5
-        r = 0
-        oldR = 0
-
-        // Reset dragging state
-        isDragging = false
-
-        // Clear localStorage
-        clearDrawingFromLocalStorage()
-
-        // Reset saved drawing flag
-        hasSavedDrawing = false
-      })
-
-      // Initialize tooltip for restart icon
-      tippy(restartIcon, {
-        content: 'Start new drawing',
-        placement: 'top',
-        arrow: true,
-        animation: 'scale',
-        theme: 'light'
-      })
-    }
-
-    // Initialize tooltip for color indicator
-    const colorIndicator = document.getElementById('color-indicator')
-    if (colorIndicator) {
-      tippy(colorIndicator, {
-        content: 'Click to change color',
-        placement: 'top',
-        arrow: true,
-        animation: 'scale',
-        theme: 'light'
-      })
-    }
-  }
-
-  // Function to create the text layer
-  const createTextLayer = () => {
-    // Create a graphics buffer for the text
-    textLayer = p.createGraphics(p.width, p.height)
-    textLayer.pixelDensity(2)
-    textLayer.smooth()
-
-    // Set the font
-    textLayer.textFont(franxurterFont)
-
-    // Calculate font size based on canvas dimensions
-    const scaleFactor = Math.min(p.width / config.baseWidth, p.height / config.baseHeight)
-    const fontSize = config.fontSize * scaleFactor
-
-    // Set text properties
-    textLayer.textSize(fontSize)
-    textLayer.textAlign(p.CENTER, p.CENTER)
-
-    // Set transparent fill and black stroke
-    textLayer.fill(0, 0) // Transparent fill
-    textLayer.stroke(0) // Black stroke
-    textLayer.strokeWeight(config.strokeWeight * scaleFactor)
-
-    // Use the text lines from config
-    const lines = config.text
-
-    // Calculate line height and vertical spacing
-    const lineHeight = 167 * scaleFactor // Use 167pts line height as specified
-    const totalHeight = lineHeight * lines.length
-    const startY = (p.height - totalHeight) / 2 + lineHeight / 2
-
-    // Draw each line of text
-    lines.forEach((line, index) => {
-      const yPos = startY + index * lineHeight
-      if (textLayer) {
-        textLayer.text(line, p.width / 2, yPos)
-      }
-    })
-  }
+  };
 
   // Draw function runs continuously
   p.draw = () => {
     // Ensure white background is maintained
-    p.background(255)
+    p.background(255);
 
-    // Display the drawing buffer first
+    // Display the drawing buffer
+    const drawingBuffer = canvas.getDrawingBuffer();
     if (drawingBuffer) {
-      p.image(drawingBuffer, 0, 0)
+      p.image(drawingBuffer, 0, 0);
     }
 
     // Display the text layer on top so the black stroke remains visible
-    if (textLayer) {
-      p.image(textLayer, 0, 0)
+    const textLayerGraphics = textLayer.getTextLayer();
+    if (textLayerGraphics) {
+      p.image(textLayerGraphics, 0, 0);
     }
 
     // Draw a line when mouse is pressed
@@ -388,132 +102,91 @@ const sketch = (p: p5) => {
       // If this is the start of a new drag, change the color
       if (!isDragging) {
         // Use the next color that was shown in the indicator
-        currentColor = nextColor
+        currentColor = nextColor;
         // Generate a new next color for after this drag
-        nextColor = getRandomColor()
+        nextColor = getRandomColor();
         // Set the stroke color for the drawing buffer
-        drawingBuffer.stroke(currentColor)
-        updateColorIndicator(currentColor)
-        isDragging = true
-        // Reset brush size for new stroke
-        brushSize = config.brushSize
+        canvas.setStrokeColor(currentColor);
+        updateColorIndicator(currentColor);
+        isDragging = true;
       }
 
       // Draw using spring-based brush technique
-      drawSpringBrush(drawingBuffer, p.mouseX, p.mouseY)
+      brush.drawSpringBrush(drawingBuffer, p.mouseX, p.mouseY);
 
       // Mark that we have a drawing that should be saved
-      hasSavedDrawing = true
+      canvas.setHasSavedDrawing(true);
     } else {
       // When mouse is released, show the next color in the indicator
       if (isDragging) {
-        updateColorIndicator(nextColor)
+        updateColorIndicator(nextColor);
         // Reset brush state when drawing stops
-        resetBrush()
+        brush.resetBrush();
 
         // Save the drawing to localStorage when the user stops drawing
-        if (drawingBuffer && hasSavedDrawing) {
-          saveDrawingToLocalStorage(drawingBuffer)
-        }
+        canvas.saveDrawing();
       }
       // Reset dragging state when mouse is released
-      isDragging = false
+      isDragging = false;
     }
-  }
+  };
 
   // Handle window resize
   p.windowResized = () => {
     // Clear the p5-container to remove any old canvases
-    const container = document.getElementById('p5-container')
+    const container = document.getElementById('p5-container');
     if (container) {
       // Remove all child elements except the current canvas
       while (container.firstChild) {
-        container.removeChild(container.firstChild)
+        container.removeChild(container.firstChild);
       }
     }
 
     // Calculate new dimensions with 4:3 aspect ratio
     const dimensions = calculateCanvasDimensions(window.innerWidth, window.innerHeight);
-    p.resizeCanvas(dimensions.width, dimensions.height)
+    p.resizeCanvas(dimensions.width, dimensions.height);
 
     // Redraw the white background
-    p.background(255)
+    p.background(255);
 
     // Create a temporary copy of the drawing buffer content
-    let tempDrawingBuffer = null
-    if (drawingBuffer) {
-      tempDrawingBuffer = p.createImage(drawingBuffer.width, drawingBuffer.height)
-      tempDrawingBuffer.copy(drawingBuffer, 0, 0, drawingBuffer.width, drawingBuffer.height, 0, 0, drawingBuffer.width, drawingBuffer.height)
-    }
+    const tempDrawingBuffer = canvas.createTempDrawingBuffer();
 
-    // Recreate the drawing buffer with new dimensions
-    drawingBuffer = p.createGraphics(p.width, p.height)
-    drawingBuffer.pixelDensity(2)
-    drawingBuffer.smooth()
-    drawingBuffer.blendMode(p.MULTIPLY)
-    drawingBuffer.stroke(currentColor)
-    drawingBuffer.strokeWeight(config.brushSize)
+    // Resize components
+    canvas.resize(tempDrawingBuffer);
+    textLayer.resize();
 
-    // Reset spring-based brush variables
-    brushSize = config.brushSize
-    isDrawing = false
-    vx = 0
-    vy = 0
-    v = 0.5
-    r = 0
-    oldR = 0
-
-    // Copy the content back if we had a previous buffer
-    if (tempDrawingBuffer) {
-      drawingBuffer.image(tempDrawingBuffer, 0, 0, p.width, p.height)
-
-      // If we had a saved drawing, save the resized version to localStorage
-      if (hasSavedDrawing) {
-        saveDrawingToLocalStorage(drawingBuffer)
-      }
-    }
-
-    // Recreate the text layer with new dimensions
-    createTextLayer()
+    // Reset brush
+    brush.resetAll();
 
     // Re-append the canvas to the container
-    const canvas = document.querySelector('canvas')
-    if (canvas && container) {
-      container.appendChild(canvas)
+    const canvasElement = document.querySelector('canvas');
+    if (canvasElement && container) {
+      container.appendChild(canvasElement);
     }
-  }
+  };
 
   // Add key press functionality to clear the canvas or save the result
   p.keyPressed = () => {
     // Clear canvas when 'c' is pressed
     if (p.key === 'c' || p.key === 'C') {
       // Reset to white background
-      p.background(255)
+      p.background(255);
       // Clear the drawing buffer
-      if (drawingBuffer) {
-        drawingBuffer.clear()
-      }
-      // Reset spring-based brush variables
-      brushSize = config.brushSize
-      isDrawing = false
-      vx = 0
-      vy = 0
-      v = 0.5
-      r = 0
-      oldR = 0
+      canvas.clearDrawingBuffer();
+      // Reset brush
+      brush.resetAll();
       // Reset dragging state
-      isDragging = false
-      // Clear localStorage
-      clearDrawingFromLocalStorage()
-      // Reset saved drawing flag
-      hasSavedDrawing = false
+      isDragging = false;
+      // Update UI
+      ui.updateUIForSavedDrawing(false);
     }
     // Save canvas when 's' is pressed
     else if (p.key === 's' || p.key === 'S') {
-      p.save('dearworldleaders_drawing.png')
+      p.save('dearworldleaders_drawing.png');
     }
-  }
-}
+  };
+};
 
 // ASCII art console message
 console.log(`
