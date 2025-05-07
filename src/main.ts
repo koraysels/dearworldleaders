@@ -463,6 +463,11 @@ const sketch = (p: p5) => {
     // Copy the content back if we had a previous buffer
     if (tempDrawingBuffer) {
       drawingBuffer.image(tempDrawingBuffer, 0, 0, p.width, p.height)
+
+      // If we had a saved drawing, save the resized version to localStorage
+      if (hasSavedDrawing) {
+        saveDrawingToLocalStorage(drawingBuffer)
+      }
     }
 
     // Recreate the text layer with new dimensions
