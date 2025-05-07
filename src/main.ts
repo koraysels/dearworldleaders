@@ -183,7 +183,9 @@ const sketch = (p: p5) => {
     // Draw each line of text
     lines.forEach((line, index) => {
       const yPos = startY + index * lineHeight
-      textLayer.text(line, p.width / 2, yPos)
+      if (textLayer) {
+        textLayer.text(line, p.width / 2, yPos)
+      }
     })
   }
 
