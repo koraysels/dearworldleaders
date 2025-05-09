@@ -18,6 +18,7 @@ const sketch = (p: p5) => {
   let currentColor = getRandomColor();
   let nextColor = getRandomColor();
   let isDragging = false;
+  let isRandomColorMode = true;
 
   // Component instances
   let brush: Brush;
@@ -56,7 +57,28 @@ const sketch = (p: p5) => {
     brush = new Brush();
     canvas = new Canvas(p);
     textLayer = new TextLayer(p, franxurterFont);
-    ui = new UI(p, canvas, brush);
+
+    // Initialize UI with color selection callback
+    ui = new UI(p, canvas, brush, (selectedColor: string) => {
+      if (selectedColor === 'random') {
+        // Enable random color mode
+        isRandomColorMode = true;
+        // Set a random color for the next stroke
+        nextColor = getRandomColor();
+        // Update the color indicator with a multicolor appearance
+        const colorIndicator = document.getElementById('color-indicator');
+        if (colorIndicator) {
+          colorIndicator.style.background = 'conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)';
+        }
+      } else {
+        // Disable random color mode
+        isRandomColorMode = false;
+        // Update the next color with the selected color
+        nextColor = selectedColor;
+        // Update the color indicator
+        updateColorIndicator(nextColor);
+      }
+    });
 
     // Create drawing buffer
     const drawingBuffer = canvas.createDrawingBuffer();
@@ -78,8 +100,11 @@ const sketch = (p: p5) => {
     // Create text layer
     textLayer.createTextLayer();
 
-    // Update the color indicator with the initial color
-    updateColorIndicator(currentColor);
+    // Update the color indicator with the multicolor wheel appearance for random mode
+    const colorIndicator = document.getElementById('color-indicator');
+    if (colorIndicator) {
+      colorIndicator.style.background = 'conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)';
+    }
 
     // Check if there's a saved drawing in localStorage and load it
     const drawingLoaded = loadDrawingFromLocalStorage(p, drawingBuffer);
@@ -135,8 +160,6 @@ const sketch = (p: p5) => {
       if (!isDragging) {
         // Use the next color that was shown in the indicator
         currentColor = nextColor;
-        // Generate a new next color for after this drag
-        nextColor = getRandomColor();
         // Set the stroke color for the drawing buffer
         canvas.setStrokeColor(currentColor);
         updateColorIndicator(currentColor);
@@ -151,7 +174,19 @@ const sketch = (p: p5) => {
     } else {
       // When mouse is released, show the next color in the indicator
       if (isDragging) {
-        updateColorIndicator(nextColor);
+        // If in random color mode, generate a new random color for the next stroke
+        if (isRandomColorMode) {
+          nextColor = getRandomColor();
+          // Keep the color indicator with the multicolor appearance
+          const colorIndicator = document.getElementById('color-indicator');
+          if (colorIndicator) {
+            colorIndicator.style.background = 'conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)';
+          }
+        } else {
+          // Otherwise, just update the color indicator with the next color
+          updateColorIndicator(nextColor);
+        }
+
         // Reset brush state when drawing stops
         brush.resetBrush();
 

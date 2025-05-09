@@ -1,16 +1,15 @@
 // Configuration object with defined colors and settings
 const config = {
   colors: [
-    '#FF5733', // Orange-Red
-    '#33FF57', // Green
-    '#3357FF', // Blue
-    '#F033FF', // Purple
-    '#FF33F0', // Pink
-    '#FFFF33', // Yellow
-    '#33FFFF', // Cyan
-    '#FF3333', // Red
-    '#33FF33', // Lime
-    '#3333FF'  // Deep Blue
+    '#FF595E', // Bright Red
+    '#FFCA3A', // Sunny Yellow
+    '#8AC926', // Lime Green
+    '#1982C4', // Sky Blue
+    '#6A4C93', // Crayon Purple
+    '#FF924C', // Orange Sherbet
+    '#C4F0C2', // Pastel Green
+    '#9D4EDD', // Vivid Violet
+    '#FFD6A5'  // Creamy Peach
   ],
   brushSize: 16, // 4x thicker than original (4)
   brushOpacity: 0.8, // Opacity of the brush (0-1)
