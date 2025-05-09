@@ -100,6 +100,9 @@ export class TextLayer {
   private drawJustifiedText(text: string, yPos: number, fontSize: number): void {
     if (!this.textLayer) return;
 
+    // Set the font size
+    this.textLayer.textSize(fontSize);
+
     // Define the width to justify to (80% of canvas width)
     const justifyWidth = this.p.width * 0.94;
 
@@ -121,7 +124,7 @@ export class TextLayer {
     let xPos = this.p.width * 0.03;
 
     // Draw each character with calculated spacing
-    chars.forEach((char, i) => {
+    chars.forEach((char) => {
       this.textLayer?.text(char, xPos, yPos);
 
       // Move to the next character position
