@@ -30,8 +30,8 @@ const sketch = (p: p5) => {
 
   // Preload function to load assets before setup
   p.preload = () => {
-    // Preload the Franxurter font
-    franxurterFont = p.loadFont('/Franxurter.otf');
+    // Preload the Franxurter font - use relative path to comply with CSP
+    franxurterFont = p.loadFont('./Franxurter.otf');
   };
 
   // Setup function runs once at the beginning

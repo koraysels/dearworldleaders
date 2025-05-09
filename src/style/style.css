@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'Franxurter';
-    src: url('/Franxurter.woff2') format('woff2'),
-    url('/Franxurter.woff') format('woff');
+    src: url('./Franxurter.woff2') format('woff2'),
+    url('./Franxurter.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
