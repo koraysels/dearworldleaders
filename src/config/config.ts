@@ -17,7 +17,7 @@ const config = {
   baseWidth: 1280, // Base width for 4:3 ratio
   baseHeight: 960, // Base height for 4:3 ratio
   text: ["DEAR WORLD", " LEADERS,", "PLEASE STOP", "FUCKING UP", "OUR PLANET"], // Text split into 5 lines
-  fontSize: 240, // Font size in points
+  fontSize: 230, // Font size in points
   strokeWeight: 2, // Stroke weight for text
 
   // Blend mode configuration
