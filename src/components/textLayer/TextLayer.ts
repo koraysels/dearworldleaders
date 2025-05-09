@@ -37,14 +37,8 @@ export class TextLayer {
     );
     const fontSize = config.fontSize * scaleFactor;
 
-    // Set text properties
-    this.textLayer.textSize(fontSize);
+    // Set text alignment
     this.textLayer.textAlign(this.p.CENTER, this.p.CENTER);
-
-    // Set transparent fill and black stroke
-    this.textLayer.fill(0, 0); // Transparent fill
-    this.textLayer.stroke(0); // Black stroke
-    this.textLayer.strokeWeight(config.strokeWeight * scaleFactor);
 
     // Use the text lines from config
     const lines = config.text;
@@ -52,11 +46,27 @@ export class TextLayer {
     // Calculate line height and vertical spacing
     const lineHeight = 167 * scaleFactor; // Use 167pts line height as specified
     const totalHeight = lineHeight * lines.length;
-    const startY = (this.p.height - totalHeight) / 2 + lineHeight / 2;
+    const startY = (this.p.height - totalHeight) / 2 + lineHeight / 4;
 
-    // Draw each line of text
+    // Draw each line of text with different styling
     lines.forEach((line, index) => {
       const yPos = startY + index * lineHeight;
+
+      if (index === 0) {
+        // First line: "Dear world Leaders" - black fill, 90pts
+        const firstLineFontSize = 90 * scaleFactor;
+        this.textLayer?.textSize(firstLineFontSize);
+        this.textLayer?.fill(0); // Black fill
+        this.textLayer?.stroke(0); // Black stroke
+        this.textLayer?.strokeWeight(0); // No stroke
+      } else {
+        // Other lines: transparent fill with black stroke
+        this.textLayer?.textSize(fontSize);
+        this.textLayer?.fill(0, 0); // Transparent fill
+        this.textLayer?.stroke(0); // Black stroke
+        this.textLayer?.strokeWeight(config.strokeWeight * scaleFactor);
+      }
+
       this.textLayer?.text(line, this.p.width / 2, yPos);
     });
 

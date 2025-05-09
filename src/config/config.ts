@@ -13,10 +13,10 @@ const config = {
   ],
   brushSize: 16, // 4x thicker than original (4)
   brushOpacity: 0.8, // Opacity of the brush (0-1)
-  aspectRatio: 4/3, // 4:3 aspect ratio for the canvas
+  aspectRatio: 16/9, // 4:3 aspect ratio for the canvas
   baseWidth: 1280, // Base width for 4:3 ratio
-  baseHeight: 960, // Base height for 4:3 ratio
-  text: ["DEAR WORLD", " LEADERS,", "PLEASE STOP", "FUCKING UP", "OUR PLANET"], // Text split into 5 lines
+  baseHeight: 720, // Base height for 4:3 ratio
+  text: ["Dear world Leaders", "PLEASE STOP", "FUCKING UP", "OUR PLANET"], // Text split into 4 lines
   fontSize: 230, // Font size in points
   strokeWeight: 2, // Stroke weight for text
 
