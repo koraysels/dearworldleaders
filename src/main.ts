@@ -106,6 +106,29 @@ const sketch = (p: p5) => {
       p.image(textLayerGraphics, 0, 0);
     }
 
+    // Show preview dot when not drawing
+    if (!isDragging && !p.mouseIsPressed && p.mouseX > 0 && p.mouseY > 0 && p.mouseX < p.width && p.mouseY < p.height) {
+      // Parse the next color and add the opacity value
+      const r = parseInt(nextColor.slice(1, 3), 16);
+      const g = parseInt(nextColor.slice(3, 5), 16);
+      const b = parseInt(nextColor.slice(5, 7), 16);
+      const a = config.brushOpacity * 255; // Convert 0-1 to 0-255 for p5.js
+
+      // Save current drawing settings
+      p.push();
+
+      // Set the fill color to match the next brush stroke
+      p.fill(r, g, b, a);
+      p.noStroke();
+
+      // Draw the preview dot
+      const brushSize = isMobileDevice() ? config.brushSize / 2 : config.brushSize;
+      p.ellipse(p.mouseX, p.mouseY, brushSize, brushSize);
+
+      // Restore previous drawing settings
+      p.pop();
+    }
+
     // Draw a line when mouse is pressed
     if (p.mouseIsPressed && drawingBuffer) {
       // If this is the start of a new drag, change the color
