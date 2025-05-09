@@ -39,7 +39,8 @@ export class Canvas {
   private applyBlendMode(): void {
     if (this.drawingBuffer) {
       // Apply the current blend mode
-      this.drawingBuffer.blendMode(this.p[this.currentBlendMode]);
+      // Use type assertion to tell TypeScript that p5 can be indexed with a string
+      this.drawingBuffer.blendMode((this.p as any)[this.currentBlendMode]);
     }
   }
 
