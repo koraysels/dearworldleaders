@@ -34,7 +34,7 @@ export class Brush {
     this.oldR = 0;
     this.spring = 0.4;
     this.friction = 0.45;
-    this.splitNum = 100;
+    this.splitNum = 30;
     this.diff = 2;
   }
 

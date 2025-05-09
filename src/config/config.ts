@@ -20,6 +20,21 @@ const config = {
   fontSize: 240, // Font size in points
   strokeWeight: 2, // Stroke weight for text
 
+  // Blend mode configuration
+  defaultBlendMode: 'BLEND', // Default blend mode
+  blendModes: [
+    'BLEND',     // Default
+    'MULTIPLY',  // Multiplies colors (darker)
+    'SCREEN',    // Opposite of multiply (lighter)
+    'OVERLAY',   // Mix of multiply and screen
+    'SOFT_LIGHT', // Softer version of overlay
+    'HARD_LIGHT', // Harsher version of overlay
+    'DODGE',     // Lightens the base color
+    'BURN',      // Darkens the base color
+    'ADD',       // Adds colors together (brighter)
+    'DIFFERENCE' // Subtracts colors (creates contrast)
+  ],
+
   // Constants for localStorage
   DRAWING_STORAGE_KEY: 'dearworldleaders_drawing'
 }

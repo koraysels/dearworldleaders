@@ -86,10 +86,30 @@ canvas {
     cursor: pointer;
 }
 
-#save-icon {
+#blend-mode-indicator {
+    display: none !important;
     position: fixed;
     bottom: 20px;
     right: 80px; /* Position to the left of the color picker */
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 3;
+    background-color: #ffffff;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+#save-icon {
+    position: fixed;
+    bottom: 20px;
+    right: 80px; /* Position to the left of the blend mode indicator */
     width: 50px;
     height: 50px;
     border-radius: 50%;

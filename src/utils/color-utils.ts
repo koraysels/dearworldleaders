@@ -14,6 +14,6 @@ export function getRandomColor(): string {
 export function updateColorIndicator(color: string): void {
   const colorIndicator = document.getElementById('color-indicator');
   if (colorIndicator) {
-    colorIndicator.style.backgroundColor = color;
+    colorIndicator.style.background = color;
   }
 }

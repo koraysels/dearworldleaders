@@ -9,6 +9,7 @@ export class Canvas {
   private p: p5;
   private drawingBuffer: p5.Graphics | null = null;
   private hasSavedDrawing: boolean = false;
+  private currentBlendMode: string = config.defaultBlendMode;
 
   /**
    * @param p - The p5 instance
@@ -26,10 +27,38 @@ export class Canvas {
     this.drawingBuffer.pixelDensity(2);
     this.drawingBuffer.smooth();
 
-    // Set blend mode to MULTIPLY for the drawing buffer
-    this.drawingBuffer.blendMode(this.p.MULTIPLY);
+    // Set blend mode from config for the drawing buffer
+    this.applyBlendMode();
 
     return this.drawingBuffer;
+  }
+
+  /**
+   * Applies the current blend mode to the drawing buffer
+   */
+  private applyBlendMode(): void {
+    if (this.drawingBuffer) {
+      // Apply the current blend mode
+      this.drawingBuffer.blendMode(this.p[this.currentBlendMode]);
+    }
+  }
+
+  /**
+   * Sets the blend mode for the drawing buffer
+   * @param blendMode - The blend mode to set
+   */
+  public setBlendMode(blendMode: string): void {
+    if (config.blendModes.includes(blendMode)) {
+      this.currentBlendMode = blendMode;
+      this.applyBlendMode();
+    }
+  }
+
+  /**
+   * Gets the current blend mode
+   */
+  public getBlendMode(): string {
+    return this.currentBlendMode;
   }
 
   /**
@@ -81,7 +110,9 @@ export class Canvas {
     this.drawingBuffer = this.p.createGraphics(this.p.width, this.p.height);
     this.drawingBuffer.pixelDensity(2);
     this.drawingBuffer.smooth();
-    this.drawingBuffer.blendMode(this.p.MULTIPLY);
+
+    // Apply the current blend mode
+    this.applyBlendMode();
 
     // Copy the content back if we had a previous buffer
     if (tempDrawingBuffer && this.drawingBuffer) {

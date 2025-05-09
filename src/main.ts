@@ -58,27 +58,38 @@ const sketch = (p: p5) => {
     canvas = new Canvas(p);
     textLayer = new TextLayer(p, franxurterFont);
 
-    // Initialize UI with color selection callback
-    ui = new UI(p, canvas, brush, (selectedColor: string) => {
-      if (selectedColor === 'random') {
-        // Enable random color mode
-        isRandomColorMode = true;
-        // Set a random color for the next stroke
-        nextColor = getRandomColor();
-        // Update the color indicator with a multicolor appearance
-        const colorIndicator = document.getElementById('color-indicator');
-        if (colorIndicator) {
-          colorIndicator.style.background = 'conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)';
+    // Initialize UI with color and blend mode selection callbacks
+    ui = new UI(
+      p, 
+      canvas, 
+      brush, 
+      // Color selection callback
+      (selectedColor: string) => {
+        if (selectedColor === 'random') {
+          // Enable random color mode
+          isRandomColorMode = true;
+          // Set a random color for the next stroke
+          nextColor = getRandomColor();
+          // Update the color indicator with a multicolor appearance
+          const colorIndicator = document.getElementById('color-indicator');
+          if (colorIndicator) {
+            colorIndicator.style.background = 'conic-gradient(red, orange, yellow, green, blue, indigo, violet, red)';
+          }
+        } else {
+          // Disable random color mode
+          isRandomColorMode = false;
+          // Update the next color with the selected color
+          nextColor = selectedColor;
+          // Update the color indicator
+          updateColorIndicator(nextColor);
         }
-      } else {
-        // Disable random color mode
-        isRandomColorMode = false;
-        // Update the next color with the selected color
-        nextColor = selectedColor;
-        // Update the color indicator
-        updateColorIndicator(nextColor);
+      },
+      // Blend mode selection callback
+      (selectedBlendMode: string) => {
+        // Set the blend mode on the canvas
+        canvas.setBlendMode(selectedBlendMode);
       }
-    });
+    );
 
     // Create drawing buffer
     const drawingBuffer = canvas.createDrawingBuffer();
@@ -162,7 +173,6 @@ const sketch = (p: p5) => {
         currentColor = nextColor;
         // Set the stroke color for the drawing buffer
         canvas.setStrokeColor(currentColor);
-        updateColorIndicator(currentColor);
         isDragging = true;
       }
 
