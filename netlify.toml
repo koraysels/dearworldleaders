@@ -11,16 +11,6 @@
   to = "/index.html"
   status = 200
 
-# Security and caching headers for SEO
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "SAMEORIGIN"
-    Referrer-Policy = "no-referrer-when-downgrade"
-    Permissions-Policy = "camera=self, microphone=self, geolocation=self"
-    Content-Security-Policy = "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; font-src 'self' 'unsafe-inline' data: https:; connect-src 'self' https:;"
-
 # Cache control for static assets
 [[headers]]
   for = "/*.svg"
